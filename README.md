@@ -45,9 +45,7 @@ Visual Studio Code does not natively support MCP servers out of the box, but you
 
 ### Configuring for Cline / Roo Code
 
-These extensions manage MCP servers via a configuration JSON file. You can usually access it by clicking the MCP icon in the extension's panel and selecting the settings/configure option.
-
-Add the `argus-mcp` entry to your `mcpServers` object. For a global installation, it will look like this:
+create .vscode/mcp.json
 
 ```json
 {
@@ -66,14 +64,13 @@ Add the `argus-mcp` entry to your `mcpServers` object. For a global installation
 }
 ```
 
-*(Note: If you are doing local development, replace the absolute paths with `${workspaceFolder}/...` and add `"PYTHONPATH": "${workspaceFolder}"` to `env`)*
-
 ## Environment Variables
 
 Regardless of the IDE or extension you use, the proxy client requires two environment variables to establish the connection to the remote SSE server:
 
 - `ARGUS_MCP_TOKEN`: Your authorization token. This is sent as a `Bearer` token in the `Authorization` header.
 - `ARGUS_MCP_URL`: The URL of your remote SSE server endpoint (e.g., `https://api.yourdomain.com/mcp/sse` or `http://localhost:8000/mcp/sse`).
+- *replace `*/Users/YOUR_USERNAME/`* with return of bash command*
 
 ## Installation
 
