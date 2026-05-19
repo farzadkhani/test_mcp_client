@@ -4,18 +4,6 @@ import anyio
 from mcp.server.stdio import stdio_server
 from mcp.client.sse import sse_client
 
-
-def _format_proxy_error(exc: BaseException) -> str:
-    """Unwrap TaskGroup/ExceptionGroup so auth/HTTP errors are visible in IDE logs."""
-    if isinstance(exc, BaseExceptionGroup):
-        parts = [_format_proxy_error(e) for e in exc.exceptions]
-        return "; ".join(parts)
-    cause = getattr(exc, "__cause__", None) or getattr(exc, "__context__", None)
-    if cause and str(exc) in ("unhandled errors in a TaskGroup", ""):
-        return _format_proxy_error(cause)
-    return str(exc)
-
-
 async def forward(read_stream, write_stream):
     async for message in read_stream:
         if isinstance(message, Exception):
@@ -23,26 +11,27 @@ async def forward(read_stream, write_stream):
             continue
         await write_stream.send(message)
 
-
 async def main_async():
     # Read the token from the environment variable (provided by VSCode MCP settings)
     token = os.environ.get("ARGUS_MCP_TOKEN")
-
+    
     if not token:
-        print(
-            "Error: ARGUS_MCP_TOKEN environment variable is required.", file=sys.stderr
-        )
+        print("Error: ARGUS_MCP_TOKEN environment variable is required.", file=sys.stderr)
         print("Please configure it in your IDE's MCP settings.", file=sys.stderr)
         sys.exit(1)
-
+        
+    # Read the URL from the environment variable (provided by VSCode MCP settings)
     url = os.environ.get("ARGUS_MCP_URL")
-
+    
+    if not url:
+        print("Error: ARGUS_MCP_URL environment variable is required.", file=sys.stderr)
+        print("Please configure it in your IDE's MCP settings.", file=sys.stderr)
+        sys.exit(1)
+    
     # Proxy the stdio streams from the IDE to the remote SSE streams
     try:
         async with stdio_server() as (stdio_read, stdio_write):
-            async with sse_client(
-                url, headers={"Authorization": f"Bearer {token}"}
-            ) as (sse_read, sse_write):
+            async with sse_client(url, headers={"Authorization": f"Bearer {token}"}) as (sse_read, sse_write):
                 async with anyio.create_task_group() as tg:
                     # Forward IDE -> FastAPI
                     tg.start_soon(forward, stdio_read, sse_write)
@@ -52,172 +41,8 @@ async def main_async():
         print(f"Proxy connection failed: {e}", file=sys.stderr)
         sys.exit(1)
 
-
 def main():
     anyio.run(main_async)
-
-
-if __name__ == "__main__":
-    main()
-
-
-"""
-{
-  "servers": {
-    "argus-mcp": {
-      "command": "${workspaceFolder}/.venv/bin/python",
-      "args": [
-        "${workspaceFolder}/run_mcp_stdio.py"
-      ],
-      "env": {
-        "PYTHONPATH": "${workspaceFolder}",
-        "ARGUS_MCP_TOKEN": "_fE4l4-vR6bHMWIz4YO8TqIlSlH2Es-3mEWomrMH7oc",
-        "DEBUG": "true"
-      }
-    }
-  }
-}
-
-"""
-import os
-import sys
-import anyio
-from mcp.server.stdio import stdio_server
-from mcp.client.sse import sse_client
-
-
-def _format_proxy_error(exc: BaseException) -> str:
-    """Unwrap TaskGroup/ExceptionGroup so auth/HTTP errors are visible in IDE logs."""
-    if isinstance(exc, BaseExceptionGroup):
-        parts = [_format_proxy_error(e) for e in exc.exceptions]
-        return "; ".join(parts)
-    cause = getattr(exc, "__cause__", None) or getattr(exc, "__context__", None)
-    if cause and str(exc) in ("unhandled errors in a TaskGroup", ""):
-        return _format_proxy_error(cause)
-    return str(exc)
-
-
-async def forward(read_stream, write_stream):
-    async for message in read_stream:
-        if isinstance(message, Exception):
-            print(f"Stream error: {message}", file=sys.stderr)
-            continue
-        await write_stream.send(message)
-
-
-async def main_async():
-    # Read the token from the environment variable (provided by VSCode MCP settings)
-    token = os.environ.get("ARGUS_MCP_TOKEN")
-
-    if not token:
-        print(
-            "Error: ARGUS_MCP_TOKEN environment variable is required.", file=sys.stderr
-        )
-        print("Please configure it in your IDE's MCP settings.", file=sys.stderr)
-        sys.exit(1)
-
-    url = os.environ.get("ARGUS_MCP_URL")
-
-    # Proxy the stdio streams from the IDE to the remote SSE streams
-    try:
-        async with stdio_server() as (stdio_read, stdio_write):
-            async with sse_client(
-                url, headers={"Authorization": f"Bearer {token}"}
-            ) as (sse_read, sse_write):
-                async with anyio.create_task_group() as tg:
-                    # Forward IDE -> FastAPI
-                    tg.start_soon(forward, stdio_read, sse_write)
-                    # Forward FastAPI -> IDE
-                    tg.start_soon(forward, sse_read, stdio_write)
-    except Exception as e:
-        print(f"Proxy connection failed: {e}", file=sys.stderr)
-        sys.exit(1)
-
-
-def main():
-    anyio.run(main_async)
-
-
-if __name__ == "__main__":
-    main()
-
-
-"""
-{
-  "servers": {
-    "argus-mcp": {
-      "command": "${workspaceFolder}/.venv/bin/python",
-      "args": [
-        "${workspaceFolder}/run_mcp_stdio.py"
-      ],
-      "env": {
-        "PYTHONPATH": "${workspaceFolder}",
-        "ARGUS_MCP_TOKEN": "_fE4l4-vR6bHMWIz4YO8TqIlSlH2Es-3mEWomrMH7oc",
-        "DEBUG": "true"
-      }
-    }
-  }
-}
-
-"""
-import os
-import sys
-import anyio
-from mcp.server.stdio import stdio_server
-from mcp.client.sse import sse_client
-
-
-def _format_proxy_error(exc: BaseException) -> str:
-    """Unwrap TaskGroup/ExceptionGroup so auth/HTTP errors are visible in IDE logs."""
-    if isinstance(exc, BaseExceptionGroup):
-        parts = [_format_proxy_error(e) for e in exc.exceptions]
-        return "; ".join(parts)
-    cause = getattr(exc, "__cause__", None) or getattr(exc, "__context__", None)
-    if cause and str(exc) in ("unhandled errors in a TaskGroup", ""):
-        return _format_proxy_error(cause)
-    return str(exc)
-
-
-async def forward(read_stream, write_stream):
-    async for message in read_stream:
-        if isinstance(message, Exception):
-            print(f"Stream error: {message}", file=sys.stderr)
-            continue
-        await write_stream.send(message)
-
-
-async def main_async():
-    # Read the token from the environment variable (provided by VSCode MCP settings)
-    token = os.environ.get("ARGUS_MCP_TOKEN")
-
-    if not token:
-        print(
-            "Error: ARGUS_MCP_TOKEN environment variable is required.", file=sys.stderr
-        )
-        print("Please configure it in your IDE's MCP settings.", file=sys.stderr)
-        sys.exit(1)
-
-    url = os.environ.get("ARGUS_MCP_URL")
-
-    # Proxy the stdio streams from the IDE to the remote SSE streams
-    try:
-        async with stdio_server() as (stdio_read, stdio_write):
-            async with sse_client(
-                url, headers={"Authorization": f"Bearer {token}"}
-            ) as (sse_read, sse_write):
-                async with anyio.create_task_group() as tg:
-                    # Forward IDE -> FastAPI
-                    tg.start_soon(forward, stdio_read, sse_write)
-                    # Forward FastAPI -> IDE
-                    tg.start_soon(forward, sse_read, stdio_write)
-    except Exception as e:
-        print(f"Proxy connection failed: {e}", file=sys.stderr)
-        sys.exit(1)
-
-
-def main():
-    anyio.run(main_async)
-
 
 if __name__ == "__main__":
     main()
