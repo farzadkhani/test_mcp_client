@@ -9,7 +9,7 @@ echo "🚀 Installing Argus MCP Client..."
 
 mkdir -p "$INSTALL_DIR"
 
-curl -sSL https://github.com/farzadkhani/test_mcp_client/blob/main/run_argus_mcp_stdio.py -o "$SCRIPT_PATH"
+curl -sSL https://raw.githubusercontent.com/farzadkhani/test_mcp_client/refs/heads/main/run_argus_mcp_stdio.py -o "$SCRIPT_PATH"
 echo "📦 Setting up Python environment..."
 
 python3 -m venv "$INSTALL_DIR/.venv"
