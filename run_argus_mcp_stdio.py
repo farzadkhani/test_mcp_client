@@ -20,8 +20,13 @@ async def main_async():
         print("Please configure it in your IDE's MCP settings.", file=sys.stderr)
         sys.exit(1)
         
-    # TODO: Use the production URL from the environment variable.
-    url = "http://localhost:8000/mcp/sse"
+    # Read the URL from the environment variable (provided by VSCode MCP settings)
+    url = os.environ.get("ARGUS_MCP_URL")
+    
+    if not url:
+        print("Error: ARGUS_MCP_URL environment variable is required.", file=sys.stderr)
+        print("Please configure it in your IDE's MCP settings.", file=sys.stderr)
+        sys.exit(1)
     
     # Proxy the stdio streams from the IDE to the remote SSE streams
     try:
