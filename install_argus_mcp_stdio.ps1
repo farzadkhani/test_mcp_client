@@ -56,7 +56,7 @@ Write-Host @"
       ],
       "env": {
         "ARGUS_MCP_TOKEN": "YOUR-ARGUS-TOKEN-HERE",
-        "ARGUS_MCP_URL": "http://localhost:8000/mcp/sse"
+        "ARGUS_MCP_URL": "http://localhost:11503/mcp/sse"
       }
     }
   }
