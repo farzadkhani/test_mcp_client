@@ -4,56 +4,40 @@ A bridge client that connects local IDEs using the `stdio` Model Context Protoco
 
 This allows your local IDE to seamlessly communicate with remote MCP tools securely and efficiently.
 
-## Using with Cursor
-
-Cursor has built-in native support for the Model Context Protocol.
-
-1. Open **Cursor Settings**
-2. Navigate to **Features** -> **MCP**
-3. Click on **+ Add New MCP Server**
-4. Configure the server with the settings below based on how you installed it.
-
-**For Global Installation (using the install script):**
-
-- **Type:** `command`
-- **Name:** `argus-mcp`
-- **Command:** `/Users/YOUR_USERNAME/.argus-mcp/.venv/bin/python`
-- **Args:** `/Users/YOUR_USERNAME/.argus-mcp/run_argus_mcp_stdio.py`
-*(Make sure to replace `/Users/YOUR_USERNAME` with your actual home directory).*
-
-Under the **Environment Variables** section, add:
-
-- `ARGUS_MCP_TOKEN`: `YOUR-ARGUS-TOKEN-HERE`
-- `ARGUS_MCP_URL`: `http://localhost:8000/mcp/sse`
-
-**For Local Development (cloned repository):**
-
-- **Type:** `command`
-- **Name:** `argus-mcp`
-- **Command:** `${workspaceFolder}/.venv/bin/python`
-- **Args:** `${workspaceFolder}/run_argus_mcp_stdio.py`
-
-Under the **Environment Variables** section, add:
-
-- `PYTHONPATH`: `${workspaceFolder}`
-- `ARGUS_MCP_TOKEN`: `YOUR-ARGUS-TOKEN-HERE`
-- `ARGUS_MCP_URL`: `http://localhost:8000/mcp/sse`
-
 ## Using with VS Code
 
-Visual Studio Code does not natively support MCP servers out of the box, but you can use it with AI assistant extensions like **Cline**, **GitHub Copilot** (via MCP integrations), or **Roo Code** (formerly Roo Cline).
+VS Code supports MCP via workspace or user `mcp.json` (see [MCP in VS Code](https://code.visualstudio.com/docs/copilot/customization/mcp)). Create `.vscode/mcp.json` in your project (or configure user-level MCP settings).
 
-### Configuring for Cline / Roo Code
-
-create .vscode/mcp.json
+### macOS / Linux (global install)
 
 ```json
 {
-  "mcpServers": {
+  "servers": {
     "argus-mcp": {
       "command": "/Users/YOUR_USERNAME/.argus-mcp/.venv/bin/python",
       "args": [
         "/Users/YOUR_USERNAME/.argus-mcp/run_argus_mcp_stdio.py"
+      ],
+      "env": {
+        "ARGUS_MCP_TOKEN": "YOUR-ARGUS-TOKEN-HERE",
+        "ARGUS_MCP_URL": "http://localhost:8000/mcp/sse"
+      }
+    }
+  }
+}
+```
+
+### Windows (global install)
+
+Replace `YOUR_USERNAME` with your Windows profile folder name (the installer prints the full paths when it finishes):
+
+```json
+{
+  "servers": {
+    "argus-mcp": {
+      "command": "C:\\Users\\YOUR_USERNAME\\.argus-mcp\\.venv\\Scripts\\python.exe",
+      "args": [
+        "C:\\Users\\YOUR_USERNAME\\.argus-mcp\\run_argus_mcp_stdio.py"
       ],
       "env": {
         "ARGUS_MCP_TOKEN": "YOUR-ARGUS-TOKEN-HERE",
@@ -74,10 +58,32 @@ Regardless of the IDE or extension you use, the proxy client requires two enviro
 
 ## Installation
 
-You can quickly install the Argus MCP client globally to your home directory (`~/.argus-mcp`) by running the following command in your terminal:
+### macOS / Linux
+
+Install globally to `~/.argus-mcp`:
 
 ```bash
 curl -sSL https://raw.githubusercontent.com/farzadkhani/test_mcp_client/refs/heads/main/install_argus_mcp_stdio.sh | bash
 ```
 
-*(This will set up a dedicated Python virtual environment and install the required dependencies like `mcp`, `anyio`, and `httpx`.)*
+### Windows (PowerShell)
+
+Install globally to `%USERPROFILE%\.argus-mcp` (requires [Python 3](https://www.python.org/downloads/) on PATH):
+
+```powershell
+irm https://raw.githubusercontent.com/farzadkhani/test_mcp_client/refs/heads/main/install_argus_mcp_stdio.ps1 | iex
+```
+
+If script execution is blocked, run once in an elevated or user PowerShell session:
+
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+```
+
+Or download and run locally:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\install_argus_mcp_stdio.ps1
+```
+
+*(Both installers set up a dedicated Python virtual environment and install `mcp`, `anyio`, and `httpx`. The Windows script prints a ready-to-copy VS Code `mcp.json` snippet with your actual paths.)*
