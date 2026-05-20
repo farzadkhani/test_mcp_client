@@ -53,7 +53,7 @@ Replace `YOUR_USERNAME` with your Windows profile folder name (the installer pri
 Regardless of the IDE or extension you use, the proxy client requires two environment variables to establish the connection to the remote SSE server:
 
 - `ARGUS_MCP_TOKEN`: Your authorization token. This is sent as a `Bearer` token in the `Authorization` header.
-- `ARGUS_MCP_URL`: The URL of your remote SSE server endpoint (e.g., `https://api.yourdomain.com/mcp/sse` or `http://localhost:8000/mcp/sse`).
+- `ARGUS_MCP_URL`: The URL of your remote SSE server endpoint (e.g., `https://api.yourdomain.com/mcp/sse` or `http://localhost:11503/mcp/sse`).
 - *replace `*/Users/YOUR_USERNAME/`* with return of bash command*
 
 ## Installation
