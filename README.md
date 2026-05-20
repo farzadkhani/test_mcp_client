@@ -20,7 +20,7 @@ VS Code supports MCP via workspace or user `mcp.json` (see [MCP in VS Code](http
       ],
       "env": {
         "ARGUS_MCP_TOKEN": "YOUR-ARGUS-TOKEN-HERE",
-        "ARGUS_MCP_URL": "http://localhost:8000/mcp/sse"
+        "ARGUS_MCP_URL": "http://localhost:11503/mcp/sse"
       }
     }
   }
@@ -41,7 +41,7 @@ Replace `YOUR_USERNAME` with your Windows profile folder name (the installer pri
       ],
       "env": {
         "ARGUS_MCP_TOKEN": "YOUR-ARGUS-TOKEN-HERE",
-        "ARGUS_MCP_URL": "http://localhost:8000/mcp/sse"
+        "ARGUS_MCP_URL": "http://localhost:11503/mcp/sse"
       }
     }
   }
@@ -74,16 +74,3 @@ Install globally to `%USERPROFILE%\.argus-mcp` (requires [Python 3](https://www.
 irm https://raw.githubusercontent.com/farzadkhani/test_mcp_client/refs/heads/main/install_argus_mcp_stdio.ps1 | iex
 ```
 
-If script execution is blocked, run once in an elevated or user PowerShell session:
-
-```powershell
-Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
-```
-
-Or download and run locally:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\install_argus_mcp_stdio.ps1
-```
-
-*(Both installers set up a dedicated Python virtual environment and install `mcp`, `anyio`, and `httpx`. The Windows script prints a ready-to-copy VS Code `mcp.json` snippet with your actual paths.)*
